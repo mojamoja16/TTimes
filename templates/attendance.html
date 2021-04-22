@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<script>
+    function updateClock() {
+        var now = new Date();
+        var today = new Date();
+        var year = today.getFullYear();
+        var month = today.getMonth() + 1;
+        var week = today.getDay();
+        var day = today.getDate();
+        var hour = now.getHours();
+        var minute = now.getMinutes();
+        var second = now.getSeconds();
+        var week_ja = new Array("日", "月", "火", "水", "木", "金", "土");
+
+        if (hour < 10) hour = "0" + hour;
+        if (minute < 10) minute = "0" + minute;
+        if (second < 10) second = "0" + second;
+        document.getElementById('myClock').innerHTML
+            = year + "年" + month + "月" + day + "日 " + "(" + week_ja[week] + ")" + "<br>" + hour + ":" + minute + ":" + second;
+    }
+    function start() {
+        setInterval("updateClock();", 1000);
+        updateClock();
+    }
+</script>
+{% endblock head %}
+
+
+{% block content %}
+
+<body onload="start();">
+    <div id="myClock" align="center" style="font:bold 20pt Times New Roman;"></div>
+    <hr>
+
+    <div class="container" align="center">
+        <form action="{% url'TTimes:views.sampleview' %}" method="POST">{% csrf_token %}
+            {{ form.as_p }}
+            <input type="submit" value="出勤" name="arrive">
+            <input type="submit" value="退勤" name="leave">
+        </form>
+    </div>
+
+</body>
+{% endblock content %}
