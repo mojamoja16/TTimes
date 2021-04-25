@@ -1,16 +1,28 @@
 from django import forms
-from .models import StaffModel
+from django.forms import IntegerField, DateField, TimeField
+from .models import StaffModel, AttendanceModel
+import datetime
+
+class StaffChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, staff):
+        return f"{staff.name}"
 
 class StaffAttendanceForm(forms.Form):
-#     staff_id = forms.IntegerField()
-    choices = [(staff.id, staff.name) for staff in StaffModel.objects.all()]
+    class Meta:
+        model = AttendanceModel
 
-    staff_name = forms.ChoiceField(choices= choices, initial= ("", "sample"))
+    staff = StaffChoiceField(
+        queryset= StaffModel.objects.all(),
+        empty_label= "choose...",
+    )
 
-# from .models import SubmitAttendance
-
-# class SubmitAttendanceForm(forms.ModelForm):
-# 
-#     class Meta:
-#         model = SubmitAttendance
-#         fields = ('place', 'in_out')
+    def save(self, in_out):
+        attendance = AttendanceModel(
+            staff = staff,
+            company = company,
+            work_style = 0,     # 将来的に日勤/夜勤用のボタンを実装
+            in_out = in_out,
+            date = datetime.date.today(),
+            time = datetime.datetime.now()
+        )
+        self.save()

@@ -47,27 +47,36 @@ def loginview(request):
     return render(request, 'login.html')
 
 def attendanceview(request):
+    if request.method == 'POST':
+        # request.POSTから打刻者のStaffModelにおけるidを取得
+        staff_id = int(request.POST["staff"])
+        # StaffModelから打刻者の名前を取得
+        staff_name = StaffModel.objects.get(pk=staff_id)
+        # StaffModelから打刻者の勤務先を取得
+        staff_company_id = StaffModel.objects.filter(name=staff_name).values_list("place", flat=True)
+        # 勤務先の名前からChildCompanyModelにおけるidを取得し，代入（将来的にはログインしている会社を選択する）
+        company = ChildCompanyModel.objects.get(pk=staff_company_id)
+        work_style = 0
+        # 将来的にはボタンを複数用意して取得するなど
+
+        if "arrive" in request.POST:    # 出勤時
+            in_out = 0
+        elif "leave" in request.POST:   # 退勤時
+            in_out = 1
+
+        attendance = AttendanceModel.objects.create(
+            staff=staff_name,
+            company=company,
+            work_style=work_style,
+            in_out=in_out,
+            date=datetime.date.today(),
+            time=datetime.datetime.now().time()
+            )
+
     template_name = "attendance.html"
     context = {"form": StaffAttendanceForm()}
     return render(request, template_name, context)
 
-def submit_attendanceview(request, pk):
-    if request.method == 'POST':
-        if "arrive" in request.POST:
-            print("just arrived" + "& id:" + str(pk))
-        elif "leave" in request.POST:
-            print("just left" + "& id:" + str(pk))
-
-
-# class IndexView(LoginRequiredMixin, View):
-#     def get(self, request):
-#         form = SubmitAttendanceForm
-#         context = {
-#             'form': form,
-#             "user": request.user,
-#         }
-#         return render(request, 'attendance/index.html', context)
-# index = IndexView.as_view()
 
 from django.http import HttpResponse
 def sampleview(request):

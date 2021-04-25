@@ -35,10 +35,10 @@
     <hr>
 
     <div class="container" align="center">
-        <form action="{% url'TTimes:views.sampleview' %}" method="POST">{% csrf_token %}
+        <form action="{% url 'attendance' %}" method="POST">{% csrf_token %}
             {{ form.as_p }}
-            <input type="submit" value="出勤" name="arrive">
-            <input type="submit" value="退勤" name="leave">
+            <input type="submit" value="出勤" id="arrive" name="arrive">
+            <input type="submit" value="退勤" id="leave" name="leave">
         </form>
     </div>
 

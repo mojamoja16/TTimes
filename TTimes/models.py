@@ -27,6 +27,7 @@ class StaffModel(models.Model):
     place = models.ForeignKey(ChildCompanyModel, on_delete=models.CASCADE, verbose_name='勤務先', default=None)
     employee_number = models.IntegerField(verbose_name='社員番号', default=None)
     authority = models.IntegerField(verbose_name='職位',choices=AUTH_LEVEL, default=0)
+    
 
     regular_start = models.TimeField(verbose_name="始業時間")
     regular_finish = models.TimeField(verbose_name="終業時間")
