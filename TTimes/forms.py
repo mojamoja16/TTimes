@@ -10,19 +10,10 @@ class StaffChoiceField(forms.ModelChoiceField):
 class StaffAttendanceForm(forms.Form):
     class Meta:
         model = AttendanceModel
+        fields = ['staff', 'company', 'work_style', 'in_out', 'datetime']
 
     staff = StaffChoiceField(
         queryset= StaffModel.objects.all(),
         empty_label= "choose...",
     )
-
-    def save(self, in_out):
-        attendance = AttendanceModel(
-            staff = staff,
-            company = company,
-            work_style = 0,     # 将来的に日勤/夜勤用のボタンを実装
-            in_out = in_out,
-            date = datetime.date.today(),
-            time = datetime.datetime.now()
-        )
-        self.save()
+    
