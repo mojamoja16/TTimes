@@ -54,7 +54,8 @@ def attendanceview(request):
 
         if form.is_valid():
             obj = form.save(commit=False)
-            obj.company = ChildCompanyModel.objects.get(id=obj.staff.id)
+            obj.company = ChildCompanyModel.objects.get(id=obj.staff.id)    # staff.idが100とかになると子会社モデルでid=100が参照されエラーする
+            # obj.company = request.user  # ログイン機能を実装したらこっち
             obj.work_style = 0
             if "arrive" in request.POST:    # 出勤時
                 obj.in_out = 0
@@ -62,7 +63,7 @@ def attendanceview(request):
             elif "leave" in request.POST:   # 退勤時
                 obj.in_out = 1
                 print("leave")
-            obj.datetime = datetime.datetime.now()
+            obj.attendance_datetime = datetime.datetime.now()
             obj.save()
 
     template_name = "attendance.html"
@@ -103,9 +104,22 @@ def sampleview(request):
     print(start.tzinfo)
     print(end.tzinfo)
 
+    morning_delta = regular_start - staff_arrive
+    evening_delta = staff_leave - regular_finish
 
-    morning_wage = delta2chunk(regular_start - staff_arrive) * morning_hourly_wage
-    ot_wage = delta2chunk(staff_leave - regular_finish) * ot_hourly_wage
+    morning_wage, ot_wage = 0, 0        # 初期化
 
+    if str(morning_delta.days).startswith("-"):
+        # 遅刻した場合
+        pass
+    else:
+        morning_wage = delta2chunk(morning_delta) * morning_hourly_wage
+        
+    if str(evening_delta.days).startswith("-"):
+        # 早退した場合
+        pass
+    else:
+        ot_wage = delta2chunk(evening_delta) * ot_hourly_wage
+    
     print("今日の残業手当は", str(morning_wage + ot_wage), "円です")
     return HttpResponse("sample")
