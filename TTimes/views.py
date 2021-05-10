@@ -42,7 +42,7 @@ def loginview(request):
 
         if user is not None:
             login(request, user)
-            return redirect('list')
+            return redirect('attendance')
         else:
             return redirect('login')
     return render(request, 'login.html')
@@ -70,6 +70,11 @@ def attendanceview(request):
     context = {"form": StaffAttendanceForm()}
     return render(request, template_name, context)
 
+from django.http import HttpResponse
+def staffpaymentview(request):
+    company = request.user
+    print(company)
+    return HttpResponse('sample')
 
 from django.http import HttpResponse
 def sampleview(request):
@@ -77,49 +82,74 @@ def sampleview(request):
     staff = "Ichiro"                        # 将来的には受け取った名前を代入する
     day = datetime.datetime.today()         # 将来的には指定された範囲の日付から順に取得する
 
-    # スタッフ名から定時と単価を取得
-    regular_start_time =  StaffModel.objects.filter(name=staff).values_list("regular_start", flat=True)[0]
-    regular_finish_time =  StaffModel.objects.filter(name=staff).values_list("regular_finish", flat=True)[0]
-    ot_hourly_wage = StaffModel.objects.filter(name=staff).values_list("ot_wage", flat=True)[0]
-    morning_hourly_wage = StaffModel.objects.filter(name=staff).values_list("morning_wage", flat=True)[0]
+    # スタッフ名から定時を取得
+    REGULAR_START_TIME =  StaffModel.objects.filter(name=staff).values_list("regular_start", flat=True)[0]
+    REGULAR_FINISH_TIME =  StaffModel.objects.filter(name=staff).values_list("regular_finish", flat=True)[0]
 
+    # スタッフ名から勤務形態を取得
+    OT_STYLE = StaffModel.objects.filter(name=staff).values_list("ot_style", flat=True)[0]
+    MORNING_STYLE = StaffModel.objects.filter(name=staff).values_list("morning_style", flat=True)[0]
+    NIGHT_STYLE = StaffModel.objects.filter(name=staff).values_list("night_style", flat=True)[0]
+    HOLIDAY_STYLE = StaffModel.objects.filter(name=staff).values_list("holiday_style", flat=True)[0]
+    
     # 定時を日付と結合してdatetime型に変更
-    regular_start = datetime.datetime.combine(day, regular_start_time)
-    regular_start = regular_start.astimezone(pytz.timezone('UTC'))
-    regular_finish = datetime.datetime.combine(day, regular_finish_time)
-    regular_finish = regular_finish.astimezone(pytz.timezone('UTC'))
+    REGULAR_START = datetime.datetime.combine(day, REGULAR_START_TIME)
+    REGULAR_START = REGULAR_START.astimezone(pytz.timezone('UTC'))
+    REGULAR_FINISH = datetime.datetime.combine(day, REGULAR_FINISH_TIME)
+    REGULAR_FINISH = REGULAR_FINISH.astimezone(pytz.timezone('UTC'))
 
-    # 検索用
-    start = datetime.datetime.combine(day, datetime.time(00,00,00))
-    start = start.astimezone(pytz.timezone('UTC'))
-    end = datetime.datetime.combine(day, datetime.time(23,59,59))
-    end = end.astimezone(pytz.timezone('UTC'))
+    # 検索用の日時指定
+    START = datetime.datetime.combine(day, datetime.time(00,00,00))
+    START = START.astimezone(pytz.timezone('UTC'))
+    END = datetime.datetime.combine(day, datetime.time(23,59,59))
+    END = END.astimezone(pytz.timezone('UTC'))
 
     # 勤怠データベースから該当する勤怠実績を取得 -> time型
-    staff_arrive = AttendanceModel.objects.filter(in_out=0, attendance_datetime__gte=start, attendance_datetime__lte=end).values_list("attendance_datetime", flat=True)[0]      # 名前と日付で指定
-    staff_leave = AttendanceModel.objects.filter(in_out=1, attendance_datetime__gte=start, attendance_datetime__lte=end).values_list("attendance_datetime", flat=True)[0]      # 名前と日付で指定
+    staff_arrive = AttendanceModel.objects.filter(in_out=0, attendance_datetime__gte=START, attendance_datetime__lte=END).values_list("attendance_datetime", flat=True)[0]      # 名前と日付で指定
+    staff_leave = AttendanceModel.objects.filter(in_out=1, attendance_datetime__gte=START, attendance_datetime__lte=END).values_list("attendance_datetime", flat=True)[0]      # 名前と日付で指定
 
-    print(staff_arrive.tzinfo)
-    print(staff_leave.tzinfo)
-    print(start.tzinfo)
-    print(end.tzinfo)
-
-    morning_delta = regular_start - staff_arrive
-    evening_delta = staff_leave - regular_finish
+    morning_delta = REGULAR_START - staff_arrive
+    evening_delta = staff_leave - REGULAR_FINISH
 
     morning_wage, ot_wage = 0, 0        # 初期化
 
+    # スタッフ名から単価を取得
+    MORNING_HOURLY_WAGE = StaffModel.objects.filter(name=staff).values_list("morning_wage", flat=True)[0]
+    OT_HOURLY_WAGE = StaffModel.objects.filter(name=staff).values_list("ot_wage", flat=True)[0]
+
+    # 出勤時間と退勤時間が05:00または22:00を跨ぐか判断する関数
+    # 8時間勤務を超えていないか判断する関数
+
+    # 勤務形態と単価から手当を算出する関数
+    def calc_payment(styl:int, wg:int, early:datetime.datetime, late:datetime.datetime):
+        if styl == 0:       # 日当の場合
+            return wg
+
+        elif styl == 1:     # 時給の場合
+            return delta2chunk(late-early) * wg
+        
+        else:               # 固定の場合
+            return wg
+
+    # 早出手当の算出
+
+
+
+
+
     if str(morning_delta.days).startswith("-"):
         # 遅刻した場合
+        print("遅刻！")
         pass
     else:
-        morning_wage = delta2chunk(morning_delta) * morning_hourly_wage
+        morning_wage = delta2chunk(morning_delta) * MORNING_HOURLY_WAGE
         
     if str(evening_delta.days).startswith("-"):
         # 早退した場合
+        print("早退！")
         pass
     else:
-        ot_wage = delta2chunk(evening_delta) * ot_hourly_wage
+        ot_wage = delta2chunk(evening_delta) * OT_HOURLY_WAGE
     
     print("今日の残業手当は", str(morning_wage + ot_wage), "円です")
     return HttpResponse("sample")

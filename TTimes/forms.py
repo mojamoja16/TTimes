@@ -14,6 +14,6 @@ class StaffAttendanceForm(forms.ModelForm):
         exclude = ['company', 'work_style', 'in_out', 'datetime']
 
     staff = StaffChoiceField(
-        queryset= StaffModel.objects.all(),
+        queryset= StaffModel.objects.filter()
         empty_label= "choose...",
     )
