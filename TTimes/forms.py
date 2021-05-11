@@ -12,8 +12,11 @@ class StaffAttendanceForm(forms.ModelForm):
         model = AttendanceModel
         fields = ['staff',]
         exclude = ['company', 'work_style', 'in_out', 'datetime']
-
-    staff = StaffChoiceField(
-        queryset= StaffModel.objects.filter()
+    def __init__(self, user, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['staff'].queryset = StaffModel.objects.filter(place=user) ## viewから持ってきたuser変数をもとに該当フィールドに表示するデータを制限
+        
+    staff = StaffChoiceField( ## ここはtemplate側で表示する名前を制限しているのに使っているので残す
+        queryset= StaffModel.objects.all(),
         empty_label= "choose...",
     )

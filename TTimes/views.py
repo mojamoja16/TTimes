@@ -67,8 +67,9 @@ def attendanceview(request):
             obj.save()
 
     template_name = "attendance.html"
-    context = {"form": StaffAttendanceForm()}
+    context = {"form": StaffAttendanceForm(user=request.user)} ## ここ変更しました。StaffAttendanceFormにユーザー情報渡してます
     return render(request, template_name, context)
+
 
 from django.http import HttpResponse
 def staffpaymentview(request):
