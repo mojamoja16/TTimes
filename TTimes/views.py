@@ -54,8 +54,8 @@ def attendanceview(request):
 
         if form.is_valid():
             obj = form.save(commit=False)
-            obj.company = ChildCompanyModel.objects.get(id=obj.staff.id)    # staff.idが100とかになると子会社モデルでid=100が参照されエラーする
-            # obj.company = request.user  # ログイン機能を実装したらこっち
+            # obj.company = ChildCompanyModel.objects.get(id=obj.staff.id)    # staff.idが100とかになると子会社モデルでid=100が参照されエラーする
+            obj.company = request.user  # ログイン機能を実装したらこっち
             obj.work_style = 0
             if "arrive" in request.POST:    # 出勤時
                 obj.in_out = 0
