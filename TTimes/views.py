@@ -65,17 +65,25 @@ def attendanceview(request):
                 print("leave")
             obj.attendance_datetime = datetime.datetime.now()
             obj.save()
-
+    
+    print(str(request.user))
+    print(type(request.user))
     template_name = "attendance.html"
-    context = {"form": StaffAttendanceForm(user=request.user)} ## ここ変更しました。StaffAttendanceFormにユーザー情報渡してます
+    context = {"form": StaffAttendanceForm(user=request.user), "company": str(request.user)} ## StaffAttendanceFormにユーザー情報渡してます
     return render(request, template_name, context)
 
 
-from django.http import HttpResponse
 def staffpaymentview(request):
     company = request.user
-    print(company)
-    return HttpResponse('sample')
+    staffs = StaffModel.objects.filter(place=company).all()
+    staff_list = {}
+    for staff in staffs:
+        staff_list[staff] = staffs.filter(name=staff).values()
+
+    template_name = "staff_payment.html"
+    context = {"staff_list": staff_list}
+    return render(request, template_name, context)
+
 
 from django.http import HttpResponse
 def sampleview(request):
