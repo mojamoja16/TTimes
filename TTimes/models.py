@@ -160,7 +160,8 @@ class AttendanceModel(models.Model):
         verbose_name_plural = "勤怠モデル"
 
     staff = models.ForeignKey(StaffModel, on_delete=models.CASCADE, related_name="staff")
-    company = models.ForeignKey(ChildCompanyModel, verbose_name='勤務先', on_delete=models.CASCADE)
+    # company = models.ForeignKey(ChildCompanyModel, verbose_name='勤務先', on_delete=models.CASCADE)
+    place = models.ForeignKey(ChildCompanyModel, verbose_name='勤務先', on_delete=models.CASCADE)
     work_style = models.IntegerField(verbose_name='日勤/夜勤', choices=WORK_STYLE, default=0)
     in_out = models.IntegerField(verbose_name='出勤/退勤', choices=IN_OUT)
     attendance_datetime = models.DateTimeField(verbose_name='打刻日時')

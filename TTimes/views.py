@@ -84,6 +84,20 @@ def staffpaymentview(request):
     context = {"staff_list": staff_list}
     return render(request, template_name, context)
 
+def attendancedetailview(request):
+    company = request.user
+    date = datetime.datetime.today()        # 将来的にはフォームから選択
+    staffs = AttendanceModel.objects.filter(company=company, attendance_datetime=date).all()
+    staff_list = {}
+    for staff in staffs:
+        staff_list[staff] = staffs.filter(name=staff).values()
+        # 出勤打刻時間から日勤/早出/夜勤/残業などを表示させる
+
+
+    template_name = "staff_payment.html"
+    context = {"staff_list": staff_list}
+    return render(request, template_name, context)
+
 
 from django.http import HttpResponse
 def sampleview(request):
@@ -113,9 +127,28 @@ def sampleview(request):
     END = datetime.datetime.combine(day, datetime.time(23,59,59))
     END = END.astimezone(pytz.timezone('UTC'))
 
-    # 勤怠データベースから該当する勤怠実績を取得 -> time型
-    staff_arrive = AttendanceModel.objects.filter(in_out=0, attendance_datetime__gte=START, attendance_datetime__lte=END).values_list("attendance_datetime", flat=True)[0]      # 名前と日付で指定
-    staff_leave = AttendanceModel.objects.filter(in_out=1, attendance_datetime__gte=START, attendance_datetime__lte=END).values_list("attendance_datetime", flat=True)[0]      # 名前と日付で指定
+    # 勤怠データベースから該当する勤怠実績を取得 -> time型のlist
+    try:
+        arrives = AttendanceModel.objects.filter(in_out=0, attendance_datetime__gte=START, attendance_datetime__lte=END).values_list("attendance_datetime", flat=True)
+    except TypeError:   # 該当なしの場合なにエラーか分からんので適当
+        # 勤怠修正画面に飛ばす
+        pass
+
+    try:
+        lefts = AttendanceModel.objects.filter(in_out=1, attendance_datetime__gte=START, attendance_datetime__lte=END).values_list("attendance_datetime", flat=True)
+    except TypeError:   # 該当なしの場合なにエラーか分からんので適当
+        # 勤怠修正画面に飛ばす
+        pass
+
+    # 出勤ボタンを二回以上押していた場合を回避する処理 早い方を採用
+    staff_arrive = arrives[0] 
+    # 退勤ボタンを二回以上押していた場合を回避する処理 遅い方を採用
+    staff_leave = lefts[len(lefts)-1]
+
+    if  arrives[0] > lefts[0]:
+        # 出勤/退勤ボタンを間違って押した時の処理 入れ替え操作
+        staff_arrive = lefts[0]
+        staff_leave = arrives[0]
 
     morning_delta = REGULAR_START - staff_arrive
     evening_delta = staff_leave - REGULAR_FINISH
@@ -127,7 +160,11 @@ def sampleview(request):
     OT_HOURLY_WAGE = StaffModel.objects.filter(name=staff).values_list("ot_wage", flat=True)[0]
 
     # 出勤時間と退勤時間が05:00または22:00を跨ぐか判断する関数
+
+
     # 8時間勤務を超えていないか判断する関数
+
+
 
     # 勤務形態と単価から手当を算出する関数
     def calc_payment(styl:int, wg:int, early:datetime.datetime, late:datetime.datetime):
@@ -140,10 +177,7 @@ def sampleview(request):
         else:               # 固定の場合
             return wg
 
-    # 早出手当の算出
-
-
-
+    # 早出手当を算出する関数
 
 
     if str(morning_delta.days).startswith("-"):
