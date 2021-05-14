@@ -20,6 +20,13 @@ def delta2chunk(delta: datetime.timedelta, chunk = 30):
     minutes = int(h) * 60 + int(m)
     return minutes // chunk
 
+# 検索の日時指定用
+def searchday(day:datetime.date):
+    START = datetime.datetime.combine(day, datetime.time(00,00,00)).astimezone(pytz.timezone('UTC'))
+    END = datetime.datetime.combine(day, datetime.time(23,59,59)).astimezone(pytz.timezone('UTC'))
+    return (START, END)
+
+
 # Create your views here.
 def signupview(request):
     if request.method == 'POST':
@@ -88,8 +95,10 @@ def staffpaymentview(request):
 def dailylistview(request):
     company = request.user
     date = datetime.datetime.today()        # 将来的にはフォームから選択
-    date = date.astimezone(pytz.timezone('UTC'))
-    staffs = AttendanceModel.objects.filter(place=company, attendance_datetime=date).all()
+    day_range = searchday(date) 
+    
+    staffs = AttendanceModel.objects.filter(place=company, attendance_datetime__range=day_range).values_list("staff", flat=True)
+    print(staffs)
     staff_list = {}
     for staff in staffs:
         staff_list[staff] = staffs.filter(staff=staff).values()
@@ -106,7 +115,8 @@ from django.http import HttpResponse
 def sampleview(request):
     # staff = StaffModel.objects.all()      # 全件取得    
     staff = "Ichiro"                        # 将来的には受け取った名前を代入する
-    day = datetime.datetime.today()         # 将来的には指定された範囲の日付から順に取得する
+    date = datetime.datetime.today()         # 将来的には指定された範囲の日付から順に取得する
+    day_range = searchday(date)
 
     # スタッフ名から定時を取得
     REGULAR_START_TIME =  StaffModel.objects.filter(name=staff).values_list("regular_start", flat=True)[0]
@@ -119,26 +129,18 @@ def sampleview(request):
     HOLIDAY_STYLE = StaffModel.objects.filter(name=staff).values_list("holiday_style", flat=True)[0]
     
     # 定時を日付と結合してdatetime型に変更
-    REGULAR_START = datetime.datetime.combine(day, REGULAR_START_TIME)
-    REGULAR_START = REGULAR_START.astimezone(pytz.timezone('UTC'))
-    REGULAR_FINISH = datetime.datetime.combine(day, REGULAR_FINISH_TIME)
-    REGULAR_FINISH = REGULAR_FINISH.astimezone(pytz.timezone('UTC'))
-
-    # 検索用の日時指定
-    START = datetime.datetime.combine(day, datetime.time(00,00,00))
-    START = START.astimezone(pytz.timezone('UTC'))
-    END = datetime.datetime.combine(day, datetime.time(23,59,59))
-    END = END.astimezone(pytz.timezone('UTC'))
+    REGULAR_START = datetime.datetime.combine(date, REGULAR_START_TIME).astimezone(pytz.timezone('UTC'))
+    REGULAR_FINISH = datetime.datetime.combine(date, REGULAR_FINISH_TIME).astimezone(pytz.timezone('UTC'))
 
     # 勤怠データベースから該当する勤怠実績を取得 -> time型のlist
     try:
-        arrives = AttendanceModel.objects.filter(in_out=0, attendance_datetime__gte=START, attendance_datetime__lte=END).values_list("attendance_datetime", flat=True)
+        arrives = AttendanceModel.objects.filter(in_out=0, attendance_datetime__range=day_range).values_list("attendance_datetime", flat=True)
     except TypeError:   # 該当なしの場合なにエラーか分からんので適当
         # 勤怠修正画面に飛ばす
         pass
 
     try:
-        lefts = AttendanceModel.objects.filter(in_out=1, attendance_datetime__gte=START, attendance_datetime__lte=END).values_list("attendance_datetime", flat=True)
+        lefts = AttendanceModel.objects.filter(in_out=1, attendance_datetime__range=day_range).values_list("attendance_datetime", flat=True)
     except TypeError:   # 該当なしの場合なにエラーか分からんので適当
         # 勤怠修正画面に飛ばす
         pass
