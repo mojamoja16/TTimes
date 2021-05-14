@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="container">
+<div id="company_name" align="left" style="font:bold 12pt Times New Roman;">{{ company }}</div>
+<hr>
+
+<div class="container" align="center">
     <table border="1">
         <tr>
             <td>従業員番号</td>
@@ -11,7 +14,7 @@
         <tr>
             <td>{{ staff.id }}</td>
             <td>{{ staff.name }}</td>
-            <td>{{ staff.ot_style }} : ￥{{ staff.ot_wage }}</td>
+            <td>{{ staff.get_ot_style_display }} : ￥{{ staff.ot_wage }}</td>
         </tr>
         {% endfor %}
     </table>

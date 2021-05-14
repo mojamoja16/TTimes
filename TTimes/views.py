@@ -50,12 +50,11 @@ def loginview(request):
 
 def attendanceview(request):
     if request.method == 'POST':
-        form = StaffAttendanceForm(request.POST or None)
+        form = StaffAttendanceForm(request.user, request.POST or None)
 
         if form.is_valid():
             obj = form.save(commit=False)
-            # obj.company = ChildCompanyModel.objects.get(id=obj.staff.id)    # staff.idが100とかになると子会社モデルでid=100が参照されエラーする
-            obj.company = request.user  # ログイン機能を実装したらこっち
+            obj.place = request.user  # ログイン機能を実装したらこっち
             obj.work_style = 0
             if "arrive" in request.POST:    # 出勤時
                 obj.in_out = 0
@@ -80,21 +79,25 @@ def staffpaymentview(request):
     for staff in staffs:
         staff_list[staff] = staffs.filter(name=staff).values()
 
+    print("-------------------------")
+    print(staff_list)
     template_name = "staff_payment.html"
     context = {"staff_list": staff_list}
     return render(request, template_name, context)
 
-def attendancedetailview(request):
+def dailylistview(request):
     company = request.user
     date = datetime.datetime.today()        # 将来的にはフォームから選択
-    staffs = AttendanceModel.objects.filter(company=company, attendance_datetime=date).all()
+    date = date.astimezone(pytz.timezone('UTC'))
+    staffs = AttendanceModel.objects.filter(place=company, attendance_datetime=date).all()
     staff_list = {}
     for staff in staffs:
-        staff_list[staff] = staffs.filter(name=staff).values()
+        staff_list[staff] = staffs.filter(staff=staff).values()
         # 出勤打刻時間から日勤/早出/夜勤/残業などを表示させる
 
-
-    template_name = "staff_payment.html"
+    print("-------------------------")
+    print(staff_list)
+    template_name = "attendance_list.html"
     context = {"staff_list": staff_list}
     return render(request, template_name, context)
 

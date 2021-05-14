@@ -173,4 +173,4 @@ class AttendanceModel(models.Model):
     correct_reason = models.CharField(verbose_name="修正理由・備考", max_length=200, null=True, blank=True)
 
     def __str__(self):
-        return str(self.staff.name) +" "+ str(self.company.name) +" "+ str(self.attendance_datetime.astimezone(pytz.timezone('Asia/Tokyo')))[:-6]
+        return str(self.staff.name) +" "+ str(self.place.name) +" "+ str(self.attendance_datetime.astimezone(pytz.timezone('Asia/Tokyo')))[:-6]

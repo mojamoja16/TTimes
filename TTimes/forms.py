@@ -11,7 +11,7 @@ class StaffAttendanceForm(forms.ModelForm):
     class Meta:
         model = AttendanceModel
         fields = ['staff',]
-        exclude = ['company', 'work_style', 'in_out', 'datetime']
+        exclude = ['place', 'work_style', 'in_out', 'datetime']
     def __init__(self, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['staff'].queryset = StaffModel.objects.filter(place=user) ## viewから持ってきたuser変数をもとに該当フィールドに表示するデータを制限

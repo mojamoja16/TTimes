@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="container">
+<div id="company_name" align="left" style="font:bold 12pt Times New Roman;">{{ company }}</div>
+<hr>
+
+
+<div class="container" align="center">
     <table border="1">
         <tr>
             <td>従業員番号</td>
@@ -14,10 +18,10 @@
         <tr>
             <td>{{ staff.id }}</td>
             <td>{{ staff.name }}</td>
-            <td>{{ staff.ot_style }} : ￥{{ staff.ot_wage }}</td>
-            <td>{{ staff.morning_style }} : ￥{{ staff.morning_wage }}</td>
-            <td>{{ staff.night_style }} : ￥{{ staff.night_wage }}</td>
-            <td>{{ staff.holiday_style }} : ￥{{ staff.holiday_wage }}</td>
+            <td>{{ staff.get_ot_style_display }} : ￥{{ staff.ot_wage }}</td>
+            <td>{{ staff.get_morning_style_display }} : ￥{{ staff.morning_wage }}</td>
+            <td>{{ staff.get_night_style_display }} : ￥{{ staff.night_wage }}</td>
+            <td>{{ staff.get_holiday_style_display }} : ￥{{ staff.holiday_wage }}</td>
             <td>
                 <a href="#">修正</a>
                 <a href="#">勤怠管理</a>
