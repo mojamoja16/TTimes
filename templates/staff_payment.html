@@ -16,7 +16,7 @@
         </tr>
         {% for staff in staff_list %}
         <tr>
-            <td>{{ staff.id }}</td>
+            <td>{{ staff.employee_number }}</td>
             <td>{{ staff.name }}</td>
             <td>{{ staff.get_ot_style_display }} : ￥{{ staff.ot_wage }}</td>
             <td>{{ staff.get_morning_style_display }} : ￥{{ staff.morning_wage }}</td>

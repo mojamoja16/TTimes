@@ -1,22 +1,38 @@
 {% extends 'base.html' %}
 {% block content %}
 <div id="company_name" align="left" style="font:bold 12pt Times New Roman;">{{ company }}</div>
-<hr>
 
-<div class="container" align="center">
-    <table border="1">
-        <tr>
-            <td>従業員番号</td>
-            <td>名前</td>
-            <td>詳細</td>
-        </tr>
-        {% for staff in staff_list %}
-        <tr>
-            <td>{{ staff.id }}</td>
-            <td>{{ staff.name }}</td>
-            <td>{{ staff.ot_wage }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-</div>
+<hr>
+<script src="jquery-3.6.0.min.js">
+    $(function selectdate() {
+        // 日付は、年-月-日 の形式でお願いする。
+        let dateFormat = 'yy-mm-dd';
+        $('#id_created_at').datepicker({
+            dateFormat: dateFormat
+        });
+    });
+</script>
+
+<body onload="selectdate();">
+    <div id="selectdate" align="center" style="font:bold 20pt Times New Roman;"></div>
+    <div class="container" align="center">
+        <table border="1">
+            <tr>
+                <td>従業員番号</td>
+                <td>名前</td>
+                <td>時刻</td>
+                <td>詳細</td>
+            </tr>
+            {% for attendance in attendances %}
+            <tr>
+                <td>{{ attendance.staff.employee_number }}</td>
+                <td>{{ attendance.staff.name }}</td>
+                <td>{{ attendance.attendance_datetime }}</td>
+                <td>{{ attendance.get_in_out_display }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+</body>
 {% endblock content %}

@@ -14,11 +14,18 @@ from .forms import StaffAttendanceForm
 # Define my function here.
 import datetime
 import pytz
+import math
 
 def delta2chunk(delta: datetime.timedelta, chunk = 30):
+    if delta < datetime.timedelta(days=0):
+        delta += datetime.timedelta(days=1)     # 遅刻/早退の場合エラーするので1日加える
     h, m, _ = str(delta).split(":")
     minutes = int(h) * 60 + int(m)
-    return minutes // chunk
+    quo = minutes // chunk
+    if quo > 0:
+        return quo
+    else:
+        return 0
 
 # 検索の日時指定用
 def searchday(day:datetime.date):
@@ -92,24 +99,59 @@ def staffpaymentview(request):
     context = {"staff_list": staff_list}
     return render(request, template_name, context)
 
+
 def dailylistview(request):
     company = request.user
     date = datetime.datetime.today()        # 将来的にはフォームから選択
     day_range = searchday(date) 
-    
-    staffs = AttendanceModel.objects.filter(place=company, attendance_datetime__range=day_range).values_list("staff", flat=True)
-    print(staffs)
+    # 出勤打刻時間から日勤/早出/夜勤/残業などを表示させる
+    attendances = AttendanceModel.objects.filter(place=company, attendance_datetime__range=day_range)
+
     staff_list = {}
-    for staff in staffs:
-        staff_list[staff] = staffs.filter(staff=staff).values()
-        # 出勤打刻時間から日勤/早出/夜勤/残業などを表示させる
 
-    print("-------------------------")
-    print(staff_list)
+    for attendance in attendances:
+        
+        staff = StaffModel.objects.filter(name=attendance.staff.name).all()
+        # スタッフ名から定時を習得
+        REGULAR_START_TIME = staff.values_list("regular_start", flat=True)[0]
+        REGULAR_FINISH_TIME = staff.values_list("regular_finish", flat=True)[0]
+
+        # 定時を日付と結合してdatetime型に変更
+        REGULAR_START = datetime.datetime.combine(date, REGULAR_START_TIME).astimezone(pytz.timezone('UTC')).astimezone(pytz.timezone('UTC'))
+        REGULAR_FINISH = datetime.datetime.combine(date, REGULAR_FINISH_TIME).astimezone(pytz.timezone('UTC')).astimezone(pytz.timezone('UTC'))
+
+        # スタッフ名から勤務形態を取得
+        OT_STYLE = staff.values_list("ot_style", flat=True)[0]
+        MORNING_STYLE = staff.values_list("morning_style", flat=True)[0]
+        NIGHT_STYLE = staff.values_list("night_style", flat=True)[0]
+        HOLIDAY_STYLE = staff.values_list("holiday_style", flat=True)[0]
+
+        # スタッフ名から単価を取得
+        MORNING_HOURLY_WAGE = staff.values_list("morning_wage", flat=True)[0]
+        OT_HOURLY_WAGE = staff.values_list("ot_wage", flat=True)[0]
+
+        morning_wage, ot_wage, status = 0, 0, ""        # 初期化
+
+        if attendance.in_out == 0:                      # 出勤時
+            morning_wage = math.floor(delta2chunk(REGULAR_START - attendance.attendance_datetime) * MORNING_HOURLY_WAGE / 2)
+            print(staff, ":", str(REGULAR_START - attendance.attendance_datetime))
+            if morning_wage > 0:
+                status = "早出"
+
+        else:                                           # 退勤時
+            ot_wage = math.floor(delta2chunk(attendance.attendance_datetime - REGULAR_FINISH) * OT_HOURLY_WAGE / 2)
+            print(staff, ":", str(attendance.attendance_datetime - REGULAR_FINISH))
+            if ot_wage > 0:
+                status = "残業"
+        
+        staff_list[attendance.staff.name] = str(morning_wage + ot_wage)
+
+        print(staff, ":", str(morning_wage + ot_wage))
+        print(attendance)
     template_name = "attendance_list.html"
-    context = {"staff_list": staff_list}
-    return render(request, template_name, context)
 
+    context = {"attendances": attendances,}
+    return render(request, template_name, context)
 
 from django.http import HttpResponse
 def sampleview(request):
