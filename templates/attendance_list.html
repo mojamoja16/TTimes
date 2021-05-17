@@ -1,9 +1,11 @@
 {% extends 'base.html' %}
+{% load static %}
+
 {% block content %}
 <div id="company_name" align="left" style="font:bold 12pt Times New Roman;">{{ company }}</div>
 
 <hr>
-<script src="jquery-3.6.0.min.js">
+<script src={% static 'js/jquery-3.6.0.min.js' %}>
     $(function selectdate() {
         // 日付は、年-月-日 の形式でお願いする。
         let dateFormat = 'yy-mm-dd';
