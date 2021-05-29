@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load widget_tweaks %}
 {% block head %}
 <script>
     function updateClock() {
@@ -31,15 +31,18 @@
 {% block content %}
 
 <body onload="start();">
-    <div id="myClock" align="center" style="font:bold 20pt Times New Roman;"></div>
-    <div id="company_name" align="left" style="font:bold 12pt Times New Roman;">{{ company }}</div>
+    <div class="name" id="myClock" align="center" style="font:bold 20pt Times New Roman;"></div>
+    <div class="name" id="company_name" align="left" style="font:bold 12pt Times New Roman;">{{ company }}</div>
     <hr>
 
     <div class="container" align="center">
+        <p class="staff_name">従業員名</p>
         <form action="{% url 'attendance' %}" method="POST">{% csrf_token %}
-            {{ form.as_p }}
-            <input type="submit" value="出勤" id="arrive" name="arrive">
-            <input type="submit" value="退勤" id="leave" name="leave">
+            <br>
+            {{ form.staff|add_class:'form_control'}}
+            <br>
+            <input class="button" type="submit" value="出勤" id="arrive" name="arrive">
+            <input class="button" type="submit" value="退勤" id="leave" name="leave">
         </form>
     </div>
 </body>
