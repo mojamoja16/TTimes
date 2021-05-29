@@ -1,13 +1,17 @@
 .name{
-  color: rgb(136, 133, 133);
+  color: rgb(148, 146, 146);
+  font:bold 20pt Times New Roman;
 }
 
 .container{
-  color: rgb(136, 133, 133);
+  color: rgb(148, 146, 146);
+  
 }
 .staff_name{
-  color: rgb(136, 133, 133);
-  text-align: center;
+  display: block;
+  color: rgb(148, 146, 146);
+  font:bold 12pt Times New Roman;
+  margin-right:350px;
  
 }
 br {
