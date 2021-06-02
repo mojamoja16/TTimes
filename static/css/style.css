@@ -1,0 +1,43 @@
+.name{
+  color: rgb(148, 146, 146);
+  font:bold 20pt Times New Roman;
+}
+
+.container{
+  color: rgb(148, 146, 146);
+  
+}
+.staff_name{
+  display: block;
+  color: rgb(148, 146, 146);
+  font:bold 12pt Times New Roman;
+  margin-right:350px;
+ 
+}
+br {
+  display: block;
+  content: "";
+  margin: 0 10px;
+  }
+
+.button{
+  background: rgb(148, 146, 146);
+  border-radius:5%;
+  padding: 15px 60px;
+  color         : #ffffff;
+  font-size     : 19pt;
+  margin: 30px 30px 4px 10px;
+}
+.form{
+  background: rgb(148, 146, 146);
+}
+
+.form_control{
+  display: block;
+  background: rgb(255, 255, 255);
+  color         : #8a8787;
+  font-size: 30px;
+  padding: 10px 130px;
+  margin: 0 0 0 0;
+  
+}
