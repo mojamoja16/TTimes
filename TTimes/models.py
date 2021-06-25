@@ -37,6 +37,7 @@ class CustomUserManager(BaseUserManager):
 class ParentCompanyModel(models.Model):
     class Meta:
         verbose_name_plural = "親会社モデル"
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
     def __str__(self):
         return self.name
@@ -44,7 +45,7 @@ class ParentCompanyModel(models.Model):
 
 class ChildCompanyModel(AbstractBaseUser, PermissionsMixin):
     # ユーザー AbstractUserをコピペし編集
-
+    id = models.AutoField(primary_key=True)
     name = models.CharField(
         _('会社名'),
         max_length=100,
@@ -76,6 +77,9 @@ class ChildCompanyModel(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
 
     parent_company= models.ForeignKey(ParentCompanyModel, on_delete=models.CASCADE, verbose_name='親会社', default='', null=True, blank=True)
+
+    # 締め日の実装をする．
+    cut_off_day = models.IntegerField(verbose_name='締め日 0で月末', default=20)
 
     objects = CustomUserManager()
 
@@ -112,22 +116,15 @@ class ChildCompanyModel(AbstractBaseUser, PermissionsMixin):
         return self.name
 
 
-"""
-class ChildCompanyModel(models.Model):
-    class Meta:
-        verbose_name_plural = "子会社モデル"
-    name = models.CharField(max_length=100)
-    parent_company= models.ForeignKey(ParentCompanyModel, on_delete=models.CASCADE, verbose_name='親会社', default=None)
-    def __str__(self):
-        return self.parent_company.name + " -- " + self.name
-"""
-
 AUTH_LEVEL = [(0, '一般職'), (1, '管理職')]
 PAY_STYLE = [(0, '日当'), (1, '時給'), (2, '固定')]
 class StaffModel(models.Model):
     class Meta:
         verbose_name_plural = "従業員モデル"
+    id = models.AutoField(primary_key=True)
     name = models.CharField(verbose_name="氏名", max_length=100)
+    email = models.EmailField(verbose_name='メールアドレス', max_length=240, null=True, blank=True)
+    password = models.CharField(verbose_name='メールアドレス', max_length=50)
     place = models.ForeignKey(ChildCompanyModel, on_delete=models.CASCADE, verbose_name='勤務先', default=None)
     employee_number = models.IntegerField(verbose_name='社員番号', default=None)
     authority = models.IntegerField(verbose_name='職位',choices=AUTH_LEVEL, default=0)
@@ -158,18 +155,24 @@ IN_OUT = [(0, '出勤'), (1, '退勤')]
 class AttendanceModel(models.Model):
     class Meta:
         verbose_name_plural = "勤怠モデル"
-
+    id = models.AutoField(primary_key=True)
     staff = models.ForeignKey(StaffModel, on_delete=models.CASCADE, related_name="staff")
-    # company = models.ForeignKey(ChildCompanyModel, verbose_name='勤務先', on_delete=models.CASCADE)
     place = models.ForeignKey(ChildCompanyModel, verbose_name='勤務先', on_delete=models.CASCADE)
     work_style = models.IntegerField(verbose_name='日勤/夜勤', choices=WORK_STYLE, default=0)
     in_out = models.IntegerField(verbose_name='出勤/退勤', choices=IN_OUT)
     attendance_datetime = models.DateTimeField(verbose_name='打刻日時')
     
-    corrector = models.ForeignKey(StaffModel, on_delete=models.CASCADE, related_name="修正者", null=True, blank=True)
-    arrive_correct = models.TimeField(verbose_name="(修正)出社時間", null=True, blank=True)
-    leave_correct = models.TimeField(verbose_name="(修正)退社時間", null=True, blank=True)
+    # 以下打刻修正時の避難用フィールド
+    ## 修正承認した管理職
+    corrector = models.ForeignKey(StaffModel, on_delete=models.CASCADE, related_name="修正承認者", null=True, blank=True)
+    ## 修正前の打刻日時
+    correct_time = models.TimeField(verbose_name="(修正前)打刻日時", null=True, blank=True)
+    ## 修正前の打刻者 = 誤って打刻したのは修正後にstaffに格納されている人物
+    correct_staff = models.ForeignKey(StaffModel, on_delete=models.CASCADE, null=True, blank=True)
+    ## 修正理由など
     correct_reason = models.CharField(verbose_name="修正理由・備考", max_length=200, null=True, blank=True)
+    ## 修正承認を行った時間
+    correction_datetime = models.DateTimeField(verbose_name="修正承認日時", auto_now_add=True, null=True, blank=True)
 
     def __str__(self):
-        return str(self.staff.name) +" "+ str(self.place.name) +" "+ str(self.attendance_datetime.astimezone(pytz.timezone('Asia/Tokyo')))[:-6]
+        return str(self.staff.name) +" "+ str(self.place.name) +" "+ str(self.attendance_datetime.astimezone(pytz.timezone('Asia/Tokyo')))

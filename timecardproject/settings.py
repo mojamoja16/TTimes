@@ -38,7 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'TTimes.apps.TtimesConfig',
-    #'bootstrap4',
+    'bootstrap4',
+    'django_static_jquery_ui',
+    'bootstrap_datepicker_plus',
     'widget_tweaks',
 ]
 
@@ -116,6 +118,18 @@ USE_L10N = True
 
 USE_TZ = True
 
+DAY_MAP = {
+    "Monday":"月",
+    "Tuesday":"火",
+    "Wednesday":"水",
+    "Thursday":"木",
+    "Friday":"金",
+    "Saturday":"土",
+    "Sunday":"日",
+}
+
+# 全角を許すな
+KILL_MULTIBYTE_MAP = {chr(0xFF01 + i): chr(0x21 + i) for i in range(94)} 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
@@ -129,3 +143,5 @@ STATICFILES_DIRS = (
 )
 
 AUTH_USER_MODEL = 'TTimes.ChildCompanyModel'
+LOGIN_URL = 'TTimes:login'
+LOGOUT_REDIRECT_URL = 'TTimes:login'
