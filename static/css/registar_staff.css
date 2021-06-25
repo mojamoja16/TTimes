@@ -1,0 +1,38 @@
+
+.form_titles{
+  color: rgb(148, 146, 146);
+  font:bold 15pt Times New Roman;
+  margin: 5px 5px 5px 5px;
+}
+
+table{
+  display: block;
+  background: rgb(255, 255, 255);
+  color         : #8a8787;
+  padding: 10px 20px;
+  margin: 0 0 0 0;
+}
+input{
+  display: block;
+  border: 1px solid gray;
+  background: rgb(255, 255, 255);
+  color         : gray;
+  padding: 8px 20px;
+  margin: 5px 5px 5px 5px;
+}
+select{
+  display: block;
+  background: rgb(255, 255, 255);
+  color         : gray;
+  padding: 8px 20px;
+  margin: 5px 5px 5px 5px;
+  border: 1px solid gray;
+}
+.send_button{
+  background: rgb(148, 146, 146);
+  border-radius:5%;
+  padding: 15px 50px;
+  color         : #ffffff;
+  font-size     : 15pt;
+  margin: 30px 30px 4px 10px;
+}

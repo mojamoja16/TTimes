@@ -25,24 +25,43 @@
         updateClock();
     }
 </script>
+<script type="text/javascript">
+    function disp() {
+        // 「OK」時の処理
+        if (window.confirm('本当にいいんですね？')) {
+            const value = document.getElementById('id_staff').value
+            if (value) {
+                document.attendance_form.submit();
+            } else {
+                window.alert('選択してください');
+            }
+        }
+​
+        // 「キャンセル」時の処理
+        else {
+            window.alert('キャンセルされました'); // 警告ダイアログを表示
+        }
+    }
+</script>
+
 {% endblock head %}
 
 
 {% block content %}
 
 <body onload="start();">
-    <div class="name" id="myClock" align="center" ></div>
-    <div class="name" id="company_name" align="left" >{{ company }}</div>
+    <div class="clock" id="myClock" align="center" ></div>
+    <div class="campany_name" id="company_name" align="left" >{{ company }}</div>
     <hr>
 
     <div class="container" align="center">
         <p class="staff_name" >従業員名</p>
-        <form action="{% url 'attendance' %}" method="POST">{% csrf_token %}
+        <form name="attendance_form" action="{% url 'TTimes:attendance' %}" method="POST">{% csrf_token %}
             <br>
             {{ form.staff|add_class:'form_control'}}
             <br>
-            <input class="button" type="submit" value="出勤" id="arrive" name="arrive">
-            <input class="button" type="submit" value="退勤" id="leave" name="leave">
+            <input class="button" type="submit" onClick="disp()" value="出勤" id="arrive" name="arrive">
+            <input class="button" type="submit" onClick="disp()" value="退勤" id="leave" name="leave">
         </form>
     </div>
 </body>

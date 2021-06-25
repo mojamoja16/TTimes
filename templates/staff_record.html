@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block head %}
+
+<link rel="stylesheet" href={% static "jquery-ui/jquery-ui.min.css" %} />
+<link rel='stylesheet' type="text/css" href="{% static 'css/staff_record.css'%}">
+<script src={% static "jquery-ui/external/jquery/jquery.js" %}></script>
+<script src={% static "jquery-ui/jquery-ui.min.js" %}></script>
+​
+<script src={% static 'js/jquery-3.6.0.min.js' %}></script>
+​
+​
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/themes/base/jquery-ui.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+​
+{% endblock head %}
+
+{% block content %}
+
+
+<body style="width:auto; margin:10 auto;">
+    <div class="layout_width" id="page_title" align="left">
+        <ul style="list-style: none; padding-left: 5px;">
+            <li class="campany_name" id="company_name" align="left">{{ company }}</li>
+            <li class="application_name" id="company_name" align="left">TTimes</li>
+            <li class="staff_list" id="company_name" align="left">従業員一覧</li>
+        </ul>
+    </div>
+
+    <div class="layout_sidebar">
+        <div class="sidebar_container">
+            <ul class="border border-white" style="list-style: none; margin-top: 10px;">
+                <li><a class="btn_btn-default" href="{% url 'TTimes:register' %}">従業員登録 ></a></li>
+                <li><a class="btn_btn-default" href="{% url 'TTimes:staffpayment' %}">従業員管理 ></a></li>
+                <li><a class="btn_btn-default" href="{% url 'TTimes:dailylist' %}">勤怠一覧 ></a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="layout_main">
+        <p class="page_title">勤怠管理</p>
+        <div class="container" align="center">
+
+            <ul class="border" style="list-style: none; margin-top: 10px; font:bold 15pt Times New Roman;">
+                <li>従業員番号：{{ staff_info.employee_number }} | 氏名：{{ staff_info.name }}</li>
+                <li>早出単価：{{ staff_info.get_morning_style_display }}：￥{{ staff_info.morning_wage }} | 残業単価：{{ staff_info.get_ot_style_display }}：￥{{ staff_info.ot_wage }}</li>
+                <li>深夜単価：{{ staff_info.get_night_style_display }}：￥{{ staff_info.night_wage }} | 休出単価：{{ staff_info.get_holiday_style_display }}：￥{{ staff_info.holiday_wage }}</li>
+            </ul>
+
+            <form action="{% url 'TTimes:staffrecord' staff_info.employee_number %}" method="POST" autocomplete="off" style="display:inline-flex;">
+                {% csrf_token %}
+                <input class="date_text" type="text" name="start" id="start_day">
+                <p style="font:bold 15pt Times New Roman;margin: auto;">～</p> 
+                <input class="date_text" type="text" name="end" id="end_day">
+            </form>
+            <input class="button" type="submit" value="更新" id="update" name="update" style="display:inline-flex;">
+            <h2>{{ display_period }}</h2>
+            <table border="1" class="table " >
+                <thead class="thead-dark">
+                    <tr align="center" valign="middle">
+                        <td>日付</td>
+                        <td>出勤</td>
+                        <td>退勤</td>
+                        <td>早出</td>
+                        <td>残業</td>
+                        <td>夜勤</td>
+                        <td>休日</td>
+                        <td>合計</td>
+                        <td>状態</td>
+                        <td>修正</td>
+                    </tr>
+                </thead>
+                {% for record in record_list %}
+                <tr align="center" valign="middle">
+                    <td>{{ record.date }}</td>
+                    <td>{{ record.arrive }}</td>
+                    <td>{{ record.leave }}</td>
+                    <td>{{ record.morning }}</td>
+                    <td>{{ record.ot }}</td>
+                    <td>{{ record.night }}</td>
+                    <td>{{ record.holiday }}</td>
+                    <td>{{ record.sum }}</td>
+                    <td>{{ record.status }}</td>
+                    <td>
+                        <a class="fix_button" href="#">修正</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+</body>
+
+
+<script>
+    // 選択された日付をminDate,maxDate用に変換        
+    function getDate(element) {
+        var date;
+        try {
+            date = $.datepicker.parseDate(format, element.value);
+        } catch (error) {
+            date = null;
+        }
+        return date;
+    }
+// 日本語化
+    $.datepicker.regional['ja'] = {
+        closeText: '閉じる',
+        prevText: '<前',
+        nextText: '次>',
+        currentText: '今日',
+        monthNames: ['1月', '2月', '3月', '4月', '5月', '6月',
+            '7月', '8月', '9月', '10月', '11月', '12月'],
+        monthNamesShort: ['1月', '2月', '3月', '4月', '5月', '6月',
+            '7月', '8月', '9月', '10月', '11月', '12月'],
+        dayNames: ['日曜日', '月曜日', '火曜日', '水曜日', '木曜日', '金曜日', '土曜日'],
+        dayNamesShort: ['日', '月', '火', '水', '木', '金', '土'],
+        dayNamesMin: ['日', '月', '火', '水', '木', '金', '土'],
+        weekHeader: '週',
+        dateFormat: 'yy/mm/dd',
+        firstDay: 0,
+        isRTL: false,
+        showMonthAfterYear: true,
+        yearSuffix: '年',
+        //年のプルダウンを表示
+        changeYear: true,
+        //月のプルダウンを表示
+        changeMonth: true,
+        numberOfMonths: 3,
+    };
+    $.datepicker.setDefaults($.datepicker.regional['ja']);
+    var dateFormat = 'yy-mm-dd';
+    var today = new Date();
+    var year = today.getFullYear();
+    var month = today.getMonth() + 1;
+    var day = today.getDate();
+
+    // 開始日の設定
+    var start = $("[name=start]").datepicker({
+        dateFormat: dateFormat,
+        maxDate: new Date(year, month - 1, day),
+    }).on("change", function () {
+        // 開始日が選択されたとき
+        // 終了日の選択可能最小日を設定
+        end.datepicker("option", "minDate", getDate(this));
+    });
+    
+    // 終了日の設定
+    var end = $("[name=end]").datepicker({
+        dateFormat: dateFormat,
+        maxDate: new Date(year, month - 1, day),
+    }).on("change", function () {
+        // 開始日が選択されたとき
+        // 開始日の選択可能最大日を設定
+        start.datepicker("option", "maxDate", getDate(this));
+    });
+
+;
+</script>
+{% endblock content %}

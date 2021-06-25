@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% block content %}
+<div id="company_name" align="left" style="font:bold 12pt Times New Roman;">{{ company }}</div>
+<hr>
+
+
+<div class="container" align="center">
+    <form method="POST">
+        {% csrf_token %}
+        <table>
+            {{ form.as_table }}
+        </table>
+        <input type="submit">
+    </form>
+
+</div>
+{% endblock content %}

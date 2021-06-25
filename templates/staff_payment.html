@@ -1,33 +1,61 @@
 {% extends 'base.html' %}
+{% load widget_tweaks %}
+{% load static %}
+{% block head %}
+<link rel='stylesheet' type="text/css" href="{% static 'css/staff_payment.css'%}">
+{% endblock head %}
+
 {% block content %}
-<div id="company_name" align="left" style="font:bold 12pt Times New Roman;">{{ company }}</div>
-<hr>
+<body  style="width:auto; margin:0 auto">
+    <div class="layout_width" id="page_title" align="left">
+        <ul style="list-style: none; padding-left: 5px;">
+            <li class="campany_name" id="company_name" align="left">{{ company }}</li>
+            <li class="application_name" id="company_name" align="left">TTimes</li>
+            <li class="staff_list" id="company_name" align="left">従業員一覧</li>
+        </ul>
+    </div>
+    
+    <div class="layout_sidebar">
+        <div class="sidebar_container">
+            <ul class="border border-white">
+                <li><a class="btn_btn-default" href="{% url 'TTimes:register' %}">従業員登録 ></a></li>
+                <li><a class="btn_btn-default" href="{% url 'TTimes:staffpayment' %}">従業員管理 ></a></li>
+                <li><a class="btn_btn-default" href="{% url 'TTimes:dailylist' %}">勤怠一覧 ></a></li>
+            </ul>
+        </div>
+    </div>
 
-
-<div class="container" align="center">
-    <table border="1">
-        <tr>
-            <td>従業員番号</td>
-            <td>名前</td>
-            <td>残業単価</td>
-            <td>早出単価</td>
-            <td>夜勤単価</td>
-            <td>休出単価</td>
-        </tr>
-        {% for staff in staff_list %}
-        <tr>
-            <td>{{ staff.employee_number }}</td>
-            <td>{{ staff.name }}</td>
-            <td>{{ staff.get_ot_style_display }} : ￥{{ staff.ot_wage }}</td>
-            <td>{{ staff.get_morning_style_display }} : ￥{{ staff.morning_wage }}</td>
-            <td>{{ staff.get_night_style_display }} : ￥{{ staff.night_wage }}</td>
-            <td>{{ staff.get_holiday_style_display }} : ￥{{ staff.holiday_wage }}</td>
-            <td>
-                <a href="#">修正</a>
-                <a href="#">勤怠管理</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
-</div>
+    <div class="layout_main" >
+        <p class="page_title">従業員管理</p>
+        <div class="container" align="center">
+            <table border="1" class="table" >
+                <thead class="thead-lignt" >
+           
+                    <tr align="center" valign="middle" >
+                        <td>従業員番号</td>
+                        <td>名前</td>
+                        <td>残業単価</td>
+                        <td>早出単価</td>
+                        <td>夜勤単価</td>
+                        <td>休出単価</td>
+                    </tr>
+                </thead>
+                {% for staff in staff_list %}
+                <tr align="center" valign="middle" >
+                    <td>{{ staff.employee_number }}</td>
+                    <td>{{ staff.name }}</td>
+                    <td>{{ staff.get_ot_style_display }} : ￥{{ staff.ot_wage }}</td>
+                    <td>{{ staff.get_morning_style_display }} : ￥{{ staff.morning_wage }}</td>
+                    <td>{{ staff.get_night_style_display }} : ￥{{ staff.night_wage }}</td>
+                    <td>{{ staff.get_holiday_style_display }} : ￥{{ staff.holiday_wage }}</td>
+                    <td>
+                        <a class="fix_button" href="#">修正</a>
+                        <a class="attendance_management_button" href="{% url 'TTimes:staffrecord' staff.employee_number %}">勤怠管理</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+</body>
 {% endblock content %}

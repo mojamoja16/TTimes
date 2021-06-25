@@ -1,0 +1,35 @@
+.update_button{
+  background: rgb(148, 146, 146);
+  border-radius:5%;
+  padding: 10px 40px;
+  color         : #ffffff;
+  font-size     : 15pt;
+  
+  margin: 10px 20px 20px 30px;
+}
+
+.cp_iptxt {
+  display: block;
+  background: rgb(255, 255, 255);
+  color         : gray;
+  padding: 10px 10px;
+  margin: 1px 1px 1px 1px;
+  
+}
+.form_date{
+  display: block;
+  background: rgb(255, 255, 255);
+  color         : gray;
+  padding: 30px 25px;
+  
+  border: 1px solid gray;
+}
+
+.fix_button{
+  background: rgb(148, 146, 146);
+  border-radius:10%;
+  padding: 7px 15px;
+  color         : #ffffff;
+  font-size     : 12pt;
+  margin: 1px 1px 1px 1px;
+}

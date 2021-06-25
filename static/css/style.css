@@ -1,8 +1,26 @@
-.name{
+.campany_name{
   color: rgb(148, 146, 146);
   font:bold 20pt Times New Roman;
 }
-
+.application_name{
+  color: rgb(148, 146, 146);
+  font:bold 20pt Times New Roman;
+}
+.staff_list{
+  color: rgb(148, 146, 146);
+  font:bold 12pt Times New Roman;
+}
+.page_title{
+  padding: 30px 30px;
+  color: rgb(148, 146, 146);
+  font:bold 18pt Times New Roman;
+  margin: 10px 1px 4px 1px;
+  line-height: 0.5em
+}
+.clock{
+  color: rgb(148, 146, 146);
+  font:bold 20pt Times New Roman;
+}
 .container{
   color: rgb(148, 146, 146);
   
@@ -12,7 +30,6 @@
   color: rgb(148, 146, 146);
   font:bold 12pt Times New Roman;
   margin-right:350px;
- 
 }
 br {
   display: block;
@@ -39,5 +56,71 @@ br {
   font-size: 30px;
   padding: 10px 130px;
   margin: 0 0 0 0;
+}
+
+.btn_btn-default{
+  background: rgb(255, 255, 255);
+  border-radius:5%;
+  padding: 3px 5px;
+  color         :gray;
+  margin: 25px 25px 25px 10px;
+  font:bold 17pt Times New Roman;
+  line-height    : 2.5em
+}
+.layout_width{
+  font:bold 15pt Times New Roman; 
+  border-bottom: medium solid gray;
+  border-width:thin;
+}
+.layout_sidebar{
+  float:left; 
+  width: 250px;
+  background-color: rgba(255,255,255,0.9);  /* 背景の設定 */
+	border: 10px solid rgba(255, 255, 255, 0.9);  /* ボーダーの設定 */
   
+}
+
+.layout_main{
+  width:auto; 
+  float:left; 
+  border-left: medium solid gray;
+  border-width:thin;
+  margin:10 auto;
+  /*background:red;*/
+  
+}
+tr,td {
+  height:1%;
+  font:bold 15pt Times New Roman;
+  
+}
+table{
+  border: none;
+
+  background: rgb(255, 255, 255);
+  color         : #8a8787;
+}
+
+input{
+  display: block;
+  border: 1px solid gray;
+  background: rgb(255, 255, 255);
+  color         : gray;
+  padding: 8px 20px;
+  margin: 5px 5px 5px 5px;
+}
+input.date_text{
+  padding: 20px 20px;
+  border: 1px solid gray;
+  font-size: 20px;
+  margin: 5px 5px 5px 5px;
+}
+
+.fix_button{
+  background: rgb(148, 146, 146);
+  border-radius:10%;
+  padding: 7px 15px;
+  color         : #ffffff;
+  font-size     : 10pt;
+  margin: 1px 1px 1px 1px;
 }

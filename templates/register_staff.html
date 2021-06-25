@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block head %}
+<link rel='stylesheet' type="text/css" href="{% static 'css/registar_staff.css'%}">
+{% endblock head %}
+
+{% block content %}
+<body style="width:auto; margin:0 auto">
+    <div class="layout_width" id="page_title" align="left" >
+        <ul style="list-style: none; padding-left: 5px;">
+            <li class="campany_name">{{ company }}</li>
+            <li class="application_name" id="company_name" align="left">TTimes</li>
+            <li class="staff_list" id="company_name" align="left">従業員一覧</li>
+        </ul>
+    </div>
+    <div class="layout_sidebar">
+        <div class="sidebar_container">
+            <ul class="border border-white" style="list-style: none; margin-top: 10px;">
+                <li><a class="btn_btn-default" href="{% url 'TTimes:register' %}">従業員登録 ></a></li>
+                <li><a class="btn_btn-default" href="{% url 'TTimes:staffpayment' %}">従業員管理 ></a></li>
+                <li><a class="btn_btn-default" href="{% url 'TTimes:dailylist' %}">勤怠一覧 ></a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="layout_main" >
+        <p class="page_title">従業員登録</p>
+        <div class="container" align="center" style="padding-top:10px">
+            <form class ="form_titles" method="POST" >
+                {% csrf_token %}
+                <table>
+                    {{ form.as_table}}
+                </table>
+                <input class="send_button" type="submit">
+            </form>
+        </div>
+    </div>
+</body>
+{% endblock content %}

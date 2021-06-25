@@ -4,7 +4,6 @@
 ​
 {% block head %}
 <link rel="stylesheet" href={% static "jquery-ui/jquery-ui.min.css" %} />
-<link rel='stylesheet' type="text/css" href="{% static 'css/attendance_list.css'%}">
 <script src={% static "jquery-ui/external/jquery/jquery.js" %}></script>
 <script src={% static "jquery-ui/jquery-ui.min.js" %}></script>
 ​
@@ -35,37 +34,25 @@
         </div>
     </div>
 
-    <div class="layout_main" >
-        <p class="page_title">勤怠一覧</p>
-        <div class="container" align="left" >
-            <div id="selectdate" align="center" style="font:bold 20pt Times New Roman;"></div>
-            <form class="cp_iptxt" action="{% url 'TTimes:dailylist' %}" method="POST" autocomplete="off"  style="display:inline-flex;">
-                {% csrf_token %}
-                {{ form.date|add_class:'form_date' }}
-            </form>
-            <input class="update_button" type="submit" value="更新" id="update" name="update" style="display:inline-flex;">
-            
-            <table border="1" class="table " >
+    <div class="layout_main">
+        <p class="page_title">従業員一覧</p>
+        <div class="container" align="center">
+            <table border="1" class="table">
                 <thead class="thead-dark">
-                    <tr align="center" valign="middle" >
-                        <td>従業員番号</td>
-                        <td>名前</td>
-                        <td>時刻</td>
+                    <tr align="center" valign="middle">
+                        <td>レコードid</td>
+                        <td>打刻者</td>
+                        <td>出勤/退勤</td>
+                        <td>打刻時間</td>
                         <td>詳細</td>
-                        <td></td>
                     </tr>
                 </thead>
-                {% for attendance in attendances %}
                 <tr align="center" valign="middle">
-                    <td>{{ attendance.staff.employee_number }}</td>
+                    <td>{{ attendance.id }}</td>
                     <td>{{ attendance.staff.name }}</td>
-                    <td>{{ attendance.attendance_datetime }}</td>
                     <td>{{ attendance.get_in_out_display }}</td>
-                    <td>
-                        <a class="fix_button" href="{% url 'TTimes:manage_attendance' attendance.id %}">修正</a>
-                    </td>
+                    <td>{{ attendance.attendance_datetime }}</td>
                 </tr>
-                {% endfor %}
             </table>
         </div>
     </div>
